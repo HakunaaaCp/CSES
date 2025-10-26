@@ -48,21 +48,25 @@ struct LineContainer : multiset<Line, less<>> {
 };
  
 const int N = 3005;
+int s[N], dp[N][N];
  
 int32_t main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
-    int n; cin >> n; 
-    vector<int> a(n), b(n), dp(n);
-    for(int &el : a) cin >> el;
-    for(int &el : b) cin >> el;
-    int x = b[0];
-    LineContainer solver;
-    dp[0] = x * a[0];
-    for(int i = 0; i < n; i++) {
-        if(i) dp[i] = min(solver.get(a[i]), x * a[i]);
-        solver.add(b[i], dp[i]);
+    int n, K; cin >> n >> K;
+    for(int i = 1; i <= n; i++) {
+        int a; cin >> a;
+        s[i] = s[i - 1] + a;
     }
-    cout << min(dp[n - 1], x * a[n - 1]);
+    for(int i = 1; i <= n; i++) dp[1][i] = s[i] * s[i];
+    for(int k = 2; k <= K; k++) {
+        LineContainer solver;
+        for(int i = 1; i <= n; i++) {
+            if(i < k - 1) continue;
+            if(i >= k) dp[k][i] = solver.get(s[i]) + s[i] * s[i];
+            solver.add(-2 * s[i], dp[k - 1][i] + s[i] * s[i]);
+        }
+    }
+    cout << dp[K][n];
     return 0;
 }
